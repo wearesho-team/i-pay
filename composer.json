@@ -1,0 +1,28 @@
+{
+  "name": "wearesho-team/i-pay",
+  "description": "IPay integration (PHP)",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Alexander Letnikow",
+      "email": "reclamme@gmail.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=7.1",
+    "ext-simplexml": "*",
+    "guzzlehttp/guzzle": "^6.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "Wearesho\\Bobra\\IPay\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Wearesho\\Bobra\\IPay\\Tests\\": "tests/"
+    }
+  }
+}
