@@ -2,29 +2,16 @@
 
 namespace Wearesho\Bobra\IPay;
 
+use Wearesho\Bobra\Payments;
+
 /**
  * Class Transaction
  * @package Wearesho\Bobra\IPay
  */
-class Transaction implements TransactionInterface
+class Transaction extends Payments\Transaction implements TransactionInterface
 {
-    /** @var string */
-    protected $currency;
-
-    /** @var int */
-    protected $service;
-
-    /** @var int */
-    protected $amount;
-
-    /** @var string */
-    protected $description;
-
     /** @var string|null */
     protected $note = null;
-
-    /** @var array */
-    protected $info = [];
 
     /** @var int|null */
     protected $fee = null;
@@ -32,57 +19,16 @@ class Transaction implements TransactionInterface
     /** @var int */
     protected $type = TransactionInterface::TYPE_CHARGE;
 
-    public function __construct(int $service, float $amount, string $description, string $currency = 'UAH')
+    public function __construct(
+        int $service,
+        float $amount,
+        string $type = TransactionInterface::TYPE_CHARGE,
+        string $description,
+        array $info = [],
+        string $currency = 'UAH'
+    )
     {
-        $this
-            ->setDescription($description)
-            ->setService($service)
-            ->setCurrency($currency)
-            ->setAmount($amount);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getService(): int
-    {
-        return $this->service;
-    }
-
-    public function setService(int $service): Transaction
-    {
-        $this->service = $service;
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
-    public function setType(int $type): Transaction
-    {
-        if ($type !== static::TYPE_CHARGE && $type !== static::TYPE_AUTHORIZATION) {
-            throw new \InvalidArgumentException("Invalid type $type");
-        }
-        $this->type = $type;
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getAmount(): int
-    {
-        return $this->amount;
-    }
-
-    public function setAmount(float $amount): Transaction
-    {
-        return $this->_setNumeric($this->amount, $amount);
+        parent::__construct($service, $amount, $type, $description, $info, $currency);
     }
 
     /**
@@ -93,46 +39,9 @@ class Transaction implements TransactionInterface
         return $this->fee;
     }
 
-    public function setFee(float $fee): Transaction
+    public function setFee(float $fee): Payments\Transaction
     {
         return $this->_setNumeric($this->fee, $fee);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getCurrency(): string
-    {
-        return $this->currency;
-    }
-
-    /**
-     * @param string $currency
-     * @return Transaction
-     * @todo: add currency validation
-     */
-    public function setCurrency(string $currency): Transaction
-    {
-        if (mb_strlen($currency) !== 3) {
-            throw new \InvalidArgumentException("Currency code length must be equal to 3");
-        }
-
-        $this->currency = mb_strtoupper($currency);
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getDescription(): string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(string $description): Transaction
-    {
-        $this->description = $description;
-        return $this;
     }
 
     /**
@@ -146,26 +55,6 @@ class Transaction implements TransactionInterface
     public function setNote(string $note = null): Transaction
     {
         $this->note = $note;
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getInfo(): array
-    {
-        return $this->info;
-    }
-
-    public function setInfo(array $info = []): Transaction
-    {
-        $this->info = $info;
-        return $this;
-    }
-
-    protected function _setNumeric(&$field, float $value): Transaction
-    {
-        $field = round($value, 2) * 100;
         return $this;
     }
 }

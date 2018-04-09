@@ -24,11 +24,20 @@ class ClientTest extends TestCase
     /** @var Payments\UrlPair */
     protected $urlPair;
 
+    /** @var IPay\Transaction */
+    protected $transaction;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->config = new IPay\Config(123456789, 'TEST_KEY', 'TEST_SECRET');
         $this->urlPair = new Payments\UrlPair('https://wearesho.com/good', 'https://wearesho.com/bad');
+        $this->transaction = new IPay\Transaction(
+            100,
+            100.50,
+            IPay\Transaction::TYPE_CHARGE,
+            "Оплата услуг"
+        );
         $this->getFunctionMock('Wearesho\\Bobra\\IPay', 'microtime')
             ->expects($this->any())->willReturn(1000);
     }
@@ -52,7 +61,7 @@ class ClientTest extends TestCase
             new GuzzleHttp\Client(['handler' => GuzzleHttp\HandlerStack::create($mock)])
         );
 
-        $client->createPayment($this->urlPair, new IPay\Transaction(0, 0, ''));
+        $client->createPayment($this->urlPair, $this->transaction);
     }
 
     /**
@@ -71,7 +80,7 @@ class ClientTest extends TestCase
 
         $client->createPayment(
             $this->urlPair,
-            new IPay\Transaction(0, 0, '')
+            $this->transaction
         );
     }
 
@@ -92,7 +101,7 @@ class ClientTest extends TestCase
             new GuzzleHttp\Client(['handler' => GuzzleHttp\HandlerStack::create($mock)])
         );
 
-        $payment = $client->createPayment($this->urlPair, new IPay\Transaction(0, 0, ''));
+        $payment = $client->createPayment($this->urlPair, $this->transaction);
         $this->assertInstanceOf(IPay\Payment::class, $payment);
         /** @var IPay\Payment $payment */
 
@@ -122,7 +131,7 @@ class ClientTest extends TestCase
         );
 
         try {
-            $payment = $client->createPayment($this->urlPair, new IPay\Transaction(0, 0, ''));
+            $payment = $client->createPayment($this->urlPair, $this->transaction);
         } catch (IPay\InvalidSignException $exception) {
             $this->assertEquals($exception->getSalt(), $salt);
             $this->assertEquals($exception->getSign(), $sign);
@@ -155,12 +164,7 @@ class ClientTest extends TestCase
             new GuzzleHttp\Client(['handler' => $stack,])
         );
 
-        $transaction = new IPay\Transaction(
-            100,
-            100.50,
-            "Оплата услуг",
-            'UAH'
-        );
+        $transaction = $this->transaction;
         $transaction->setFee(50.25);
         $transaction->setNote("Заметка");
         $transaction->setInfo([

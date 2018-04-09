@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "4ad97455e20c3f4be37d12c24c4c98a9",
+    "content-hash": "3dcc95eb7b0c7e0e79b565f997e5b058",
     "packages": [
         {
             "name": "doctrine/instantiator",
@@ -1643,16 +1643,16 @@
         },
         {
             "name": "wearesho-team/bobra-payments",
-            "version": "1.0.1",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wearesho-team/bobra-payments.git",
-                "reference": "efa4ff972edcc08f8b6b1850d69337fe4c610a22"
+                "reference": "6ea41a05473903de813d281651d4af0a6b2720ce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wearesho-team/bobra-payments/zipball/efa4ff972edcc08f8b6b1850d69337fe4c610a22",
-                "reference": "efa4ff972edcc08f8b6b1850d69337fe4c610a22",
+                "url": "https://api.github.com/repos/wearesho-team/bobra-payments/zipball/6ea41a05473903de813d281651d4af0a6b2720ce",
+                "reference": "6ea41a05473903de813d281651d4af0a6b2720ce",
                 "shasum": ""
             },
             "require": {
@@ -1676,7 +1676,7 @@
                 }
             ],
             "description": "Common interfaces for processing payment",
-            "time": "2018-04-09T16:24:11+00:00"
+            "time": "2018-04-09T17:13:36+00:00"
         },
         {
             "name": "webmozart/assert",
