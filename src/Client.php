@@ -6,10 +6,10 @@ use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * Class Merchant
+ * Class Client
  * @package Wearesho\Bobra\IPay
  */
-class Merchant
+class Client
 {
     public const ACTION_COMPLETE = 'complete';
     public const ACTION_REVERSAL = 'reversal';
@@ -27,17 +27,17 @@ class Merchant
 
     /**
      * @param UrlPair $url
-     * @param array $transactions
+     * @param TransactionInterface|TransactionInterface[] $transactions
      * @return string
      * @throws InvalidSignException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function createPayment(UrlPair $url, array $transactions)
+    public function createPayment(UrlPair $url, $transactions)
     {
         $request = [
             'auth' => $this->_requestAuth(),
             'urls' => $this->_convertUrlPairToArray($url),
-            'transactions' => array_map([$this, '_convertTransactionToArray'], $transactions),
+            'transactions' => array_map([$this, '_convertTransactionToArray'], (array)$transactions),
             'lifetime' => $this->config->getLifetime(),
             'version' => $this->config->getVersion(),
             'lang' => $this->config->getLanguage(),
@@ -54,7 +54,7 @@ class Merchant
      */
     public function reversePayment(int $paymentId): string
     {
-        return $this->completePayment($paymentId, Merchant::ACTION_REVERSAL);
+        return $this->completePayment($paymentId, Client::ACTION_REVERSAL);
     }
 
     /**
@@ -64,7 +64,7 @@ class Merchant
      * @throws InvalidSignException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function completePayment(int $paymentId, string $action = Merchant::ACTION_COMPLETE): string
+    public function completePayment(int $paymentId, string $action = Client::ACTION_COMPLETE): string
     {
         $request = [
             'auth' => $this->_requestAuth(),

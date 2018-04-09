@@ -57,7 +57,8 @@ interface TransactionInterface
 
     /**
      * Любая дополнительная информация о транзакции
-     * @return \JsonSerializable
+     * будет приведена к JSON при запросе
+     * @return array
      */
-    public function getInfo(): \JsonSerializable;
+    public function getInfo(): array;
 }

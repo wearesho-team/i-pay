@@ -33,7 +33,7 @@ class Config implements ConfigInterface
     protected $version = '3.00';
 
     /** @var int */
-    protected $lifetime = 1;
+    protected $lifetime = 24;
 
     public function __construct(int $id, string $key, string $secret)
     {
@@ -67,7 +67,7 @@ class Config implements ConfigInterface
                 $this->url = 'https://api.ipay.ua/';
                 break;
             default:
-                throw new \InvalidArgumentException("Invalid mode.");
+                throw new \InvalidArgumentException("Invalid mode");
         }
 
         return $this;
