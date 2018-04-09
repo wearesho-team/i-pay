@@ -11,9 +11,6 @@ class Config implements ConfigInterface
     public const MODE_REAL = 'real';
     public const MODE_TEST = 'test';
 
-    protected const URL_TEST = 'https://api.sandbox.ipay.ua/';
-    protected const URL_REAL = 'https://api.ipay.ua/';
-
     /** @var int */
     protected $id;
 
