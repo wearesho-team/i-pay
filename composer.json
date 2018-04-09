@@ -13,7 +13,8 @@
   "require": {
     "php": ">=7.1",
     "ext-simplexml": "*",
-    "guzzlehttp/guzzle": "^6.3"
+    "guzzlehttp/guzzle": "^6.3",
+    "wearesho-team/bobra-payments": "^1.0.1"
   },
   "autoload": {
     "psr-4": {

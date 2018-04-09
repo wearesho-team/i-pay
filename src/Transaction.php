@@ -58,7 +58,7 @@ class Transaction implements TransactionInterface
     /**
      * @inheritdoc
      */
-    public function getType(): int
+    public function getType(): string
     {
         return $this->type;
     }

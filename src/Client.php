@@ -2,15 +2,14 @@
 
 namespace Wearesho\Bobra\IPay;
 
-use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\RequestException;
-use Psr\Http\Message\ResponseInterface;
+use GuzzleHttp;
+use Wearesho\Bobra\Payments;
 
 /**
  * Class Client
  * @package Wearesho\Bobra\IPay
  */
-class Client
+class Client implements Payments\ClientInterface
 {
     public const ACTION_COMPLETE = 'complete';
     public const ACTION_REVERSAL = 'reversal';
@@ -18,32 +17,41 @@ class Client
     /** @var ConfigInterface */
     protected $config;
 
-    /** @var ClientInterface */
+    /** @var GuzzleHttp\ClientInterface */
     protected $client;
 
-    public function __construct(ConfigInterface $config, ClientInterface $client)
+    public function __construct(ConfigInterface $config, GuzzleHttp\ClientInterface $client)
     {
         $this->config = $config;
         $this->client = $client;
     }
 
     /**
-     * @param UrlPair $url
-     * @param TransactionInterface|TransactionInterface[] $transactions
-     * @return Payment
-     * @throws InvalidSignException
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @param Payments\UrlPairInterface $pair
+     * @param TransactionInterface|Payments\TransactionInterface $transaction
+     * @return Payments\PaymentInterface
      * @throws ApiException
+     * @throws GuzzleHttp\Exception\GuzzleException
+     * @throws InvalidSignException
      */
-    public function createPayment(UrlPair $url, $transactions): Payment
+    public function createPayment(Payments\UrlPairInterface $pair, Payments\TransactionInterface $transaction): Payments\PaymentInterface
     {
-        if (!is_array($transactions)) {
-            $transactions = [$transactions];
-        }
+        return $this->createPaymentMultiple($pair, [$transaction]);
+    }
 
+    /**
+     * @param Payments\UrlPairInterface $pair
+     * @param TransactionInterface[]|Payments\TransactionInterface[] $transactions
+     * @return Payment
+     * @throws ApiException
+     * @throws GuzzleHttp\Exception\GuzzleException
+     * @throws InvalidSignException
+     */
+    public function createPaymentMultiple(Payments\UrlPairInterface $pair, array $transactions): Payment
+    {
         $request = [
             'auth' => $this->_requestAuth(),
-            'urls' => $this->_convertUrlPairToArray($url),
+            'urls' => $this->_convertUrlPairToArray($pair),
             'transactions' => array_map([$this, '_convertTransactionToArray'], $transactions),
             'lifetime' => $this->config->getLifetime(),
             'version' => $this->config->getVersion(),
@@ -84,7 +92,7 @@ class Client
         return $this->_request($request);
     }
 
-    private function _convertUrlPairToArray(UrlPair $pair): array
+    private function _convertUrlPairToArray(Payments\UrlPairInterface $pair): array
     {
         return [
             'good' => $pair->getGood(),
@@ -92,7 +100,7 @@ class Client
         ];
     }
 
-    private function _convertTransactionToArray(TransactionInterface $transaction): array
+    private function _convertTransactionToArray(Payments\TransactionInterface $transaction): array
     {
         $array = [
             'mch_id' => $this->config->getId(),
@@ -104,14 +112,16 @@ class Client
             'info' => json_encode($transaction->getInfo()),
         ];
 
-        $note = $transaction->getNote();
-        if (!is_null($note)) {
-            $array['node'] = $note;
-        }
+        if ($transaction instanceof TransactionInterface) {
+            $note = $transaction->getNote();
+            if (!is_null($note)) {
+                $array['node'] = $note;
+            }
 
-        $fee = $transaction->getFee();
-        if (!is_null($fee)) {
-            $array['fee'] = $fee;
+            $fee = $transaction->getFee();
+            if (!is_null($fee)) {
+                $array['fee'] = $fee;
+            }
         }
 
         return $array;
@@ -145,7 +155,7 @@ class Client
                 ],
             ]);
 
-        } catch (RequestException $exception) {
+        } catch (GuzzleHttp\Exception\RequestException $exception) {
             $body = (string)$exception->getResponse()->getBody();
             if (!preg_match('/<error>(.*)/', $body)) {
                 throw $exception;

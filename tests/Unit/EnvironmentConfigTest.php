@@ -71,4 +71,11 @@ class EnvironmentConfigTest extends TestCase
         putenv("TIPAY_LANGUAGE=" . ConfigInterface::LANGUAGE_RU);
         $this->assertEquals(ConfigInterface::LANGUAGE_RU, $this->config->getLanguage());
     }
+
+    public function testGetVersion()
+    {
+        $this->assertEquals('3.00', $this->config->getVersion());
+        putenv('TIPAY_VERSION=3.01');
+        $this->assertEquals('3.01', $this->config->getVersion());
+    }
 }

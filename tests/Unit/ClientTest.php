@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnhandledExceptionInspection */
 
 namespace Wearesho\Bobra\IPay\Tests\Unit;
 
@@ -8,6 +8,7 @@ use GuzzleHttp\Psr7\Response;
 use phpmock\phpunit\PHPMock;
 use PHPUnit\Framework\TestCase;
 use Wearesho\Bobra\IPay;
+use Wearesho\Bobra\Payments;
 
 /**
  * Class ClientTest
@@ -20,14 +21,14 @@ class ClientTest extends TestCase
     /** @var IPay\Config */
     protected $config;
 
-    /** @var IPay\UrlPair */
+    /** @var Payments\UrlPair */
     protected $urlPair;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->config = new IPay\Config(123456789, 'TEST_KEY', 'TEST_SECRET');
-        $this->urlPair = new IPay\UrlPair('https://wearesho.com/good', 'https://wearesho.com/bad');
+        $this->urlPair = new Payments\UrlPair('https://wearesho.com/good', 'https://wearesho.com/bad');
         $this->getFunctionMock('Wearesho\\Bobra\\IPay', 'microtime')
             ->expects($this->any())->willReturn(1000);
     }
@@ -92,6 +93,8 @@ class ClientTest extends TestCase
         );
 
         $payment = $client->createPayment($this->urlPair, new IPay\Transaction(0, 0, ''));
+        $this->assertInstanceOf(IPay\Payment::class, $payment);
+        /** @var IPay\Payment $payment */
 
         $this->assertEquals($payment->getId(), $pid);
         $this->assertEquals($payment->getUrl(), $url);
@@ -164,7 +167,7 @@ class ClientTest extends TestCase
             'author' => 'Wearesho',
         ]);
 
-        $client->createPayment($this->urlPair, [$transaction]);
+        $client->createPayment($this->urlPair, $transaction);
         $client->completePayment(10);
         $client->reversePayment(11);
 
