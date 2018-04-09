@@ -7,7 +7,7 @@
 
 ## Installation
 Using composer:
-```php
+```bash
 composer install wearesho-team/i-pay
 ```
 
