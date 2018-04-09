@@ -3,6 +3,8 @@
 namespace Wearesho\Bobra\IPay;
 
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\RequestException;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -31,6 +33,7 @@ class Client
      * @return Payment
      * @throws InvalidSignException
      * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws ApiException
      */
     public function createPayment(UrlPair $url, $transactions): Payment
     {
@@ -58,6 +61,7 @@ class Client
      * @return string
      * @throws InvalidSignException
      * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws ApiException
      */
     public function reversePayment(int $paymentId): string
     {
@@ -70,6 +74,7 @@ class Client
      * @return mixed
      * @throws InvalidSignException
      * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws ApiException
      */
     public function completePayment(int $paymentId, string $action = Client::ACTION_COMPLETE): string
     {
@@ -132,14 +137,25 @@ class Client
      * @return ResponseInterface
      * @throws InvalidSignException
      * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws ApiException
      */
     private function _request(array $data): ResponseInterface
     {
-        $response = $this->client->request('post', $this->config->getUrl(), [
-            'form_params' => [
-                'data' => $this->_toXml($data),
-            ],
-        ]);
+        try {
+            $response = $this->client->request('post', $this->config->getUrl(), [
+                'form_params' => [
+                    'data' => $this->_toXml($data),
+                ],
+            ]);
+
+        } catch (RequestException $exception) {
+            $body = (string)$exception->getResponse()->getBody();
+            if (!preg_match('/<error>(.*)/', $body)) {
+                throw $exception;
+            }
+            $xml = simplexml_load_string($body);
+            throw new ApiException($xml->code);
+        }
 
         $this->_checkResponseSign((string)$response->getBody());
         return $response;
