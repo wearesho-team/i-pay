@@ -28,11 +28,11 @@ class Client
     /**
      * @param UrlPair $url
      * @param TransactionInterface|TransactionInterface[] $transactions
-     * @return string
+     * @return Payment
      * @throws InvalidSignException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function createPayment(UrlPair $url, $transactions)
+    public function createPayment(UrlPair $url, $transactions): Payment
     {
         $request = [
             'auth' => $this->_requestAuth(),
@@ -43,7 +43,14 @@ class Client
             'lang' => $this->config->getLanguage(),
         ];
 
-        return $this->_request($request);
+        $response = $this->_request($request);
+        $object = simplexml_load_string($response);
+
+        return new Payment(
+            (int)$object->pid,
+            (string)$object->url,
+            (int)$object->status
+        );
     }
 
     /**

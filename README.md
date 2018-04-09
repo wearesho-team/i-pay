@@ -30,7 +30,7 @@ $client = new IPay\Client($config, new \GuzzleHttp\Client());
  * Creating payment
  */
 
-$client->createPayment(
+$payment = $client->createPayment(
     new IPay\UrlPair(
         'http://ipay.ua/good',
         'http://ipay.ua/bad'
@@ -43,7 +43,7 @@ $client->createPayment(
         ),
     ]
 );
-
+$payment->getUrl(); // You should redirect user to this page to make payment
 
 /**
  * Competing payment
