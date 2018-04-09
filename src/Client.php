@@ -3,7 +3,6 @@
 namespace Wearesho\Bobra\IPay;
 
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use Psr\Http\Message\ResponseInterface;
 
@@ -25,6 +24,7 @@ class Client
     public function __construct(ConfigInterface $config, ClientInterface $client)
     {
         $this->config = $config;
+        $this->client = $client;
     }
 
     /**
@@ -37,33 +37,30 @@ class Client
      */
     public function createPayment(UrlPair $url, $transactions): Payment
     {
+        if (!is_array($transactions)) {
+            $transactions = [$transactions];
+        }
+
         $request = [
             'auth' => $this->_requestAuth(),
             'urls' => $this->_convertUrlPairToArray($url),
-            'transactions' => array_map([$this, '_convertTransactionToArray'], (array)$transactions),
+            'transactions' => array_map([$this, '_convertTransactionToArray'], $transactions),
             'lifetime' => $this->config->getLifetime(),
             'version' => $this->config->getVersion(),
             'lang' => $this->config->getLanguage(),
         ];
 
-        $response = $this->_request($request);
-        $object = simplexml_load_string($response);
-
-        return new Payment(
-            (int)$object->pid,
-            (string)$object->url,
-            (int)$object->status
-        );
+        return $this->_request($request);
     }
 
     /**
      * @param int $paymentId
-     * @return string
+     * @return Payment
      * @throws InvalidSignException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws ApiException
      */
-    public function reversePayment(int $paymentId): string
+    public function reversePayment(int $paymentId): Payment
     {
         return $this->completePayment($paymentId, Client::ACTION_REVERSAL);
     }
@@ -71,12 +68,12 @@ class Client
     /**
      * @param int $paymentId
      * @param string $action
-     * @return mixed
+     * @return Payment
      * @throws InvalidSignException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws ApiException
      */
-    public function completePayment(int $paymentId, string $action = Client::ACTION_COMPLETE): string
+    public function completePayment(int $paymentId, string $action = Client::ACTION_COMPLETE): Payment
     {
         $request = [
             'auth' => $this->_requestAuth(),
@@ -134,12 +131,12 @@ class Client
 
     /**
      * @param array $data
-     * @return ResponseInterface
+     * @return Payment
      * @throws InvalidSignException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws ApiException
      */
-    private function _request(array $data): ResponseInterface
+    private function _request(array $data): Payment
     {
         try {
             $response = $this->client->request('post', $this->config->getUrl(), [
@@ -154,11 +151,17 @@ class Client
                 throw $exception;
             }
             $xml = simplexml_load_string($body);
-            throw new ApiException($xml->code);
+            throw new ApiException((int)$xml->code);
         }
 
         $this->_checkResponseSign((string)$response->getBody());
-        return $response;
+        $object = simplexml_load_string((string)$response->getBody());
+
+        return new Payment(
+            (int)$object->pid,
+            (string)$object->url,
+            (int)$object->status
+        );
     }
 
 

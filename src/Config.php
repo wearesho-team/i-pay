@@ -24,7 +24,7 @@ class Config implements ConfigInterface
     protected $secret;
 
     /** @var string */
-    protected $language;
+    protected $language = ConfigInterface::LANGUAGE_UA;
 
     /** @var string */
     protected $url = Config::URL_TEST;

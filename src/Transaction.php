@@ -34,9 +34,11 @@ class Transaction implements TransactionInterface
 
     public function __construct(int $service, float $amount, string $description, string $currency = 'UAH')
     {
-        $this->service = $service;
-        $this->_setNumeric($this->amount, $amount);
-        $this->description = $description;
+        $this
+            ->setDescription($description)
+            ->setService($service)
+            ->setCurrency($currency)
+            ->setAmount($amount);
     }
 
     /**

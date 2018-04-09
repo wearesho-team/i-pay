@@ -1,4 +1,9 @@
 # IPay Integration
+[![Latest Stable Version](https://poser.pugx.org/wearesho-team/i-pay/v/stable.png)](https://packagist.org/packages/wearesho-team/i-pay)
+[![Total Downloads](https://poser.pugx.org/wearesho-team/i-pay/downloads.png)](https://packagist.org/packages/wearesho-team/i-pay)
+[![Build Status](https://travis-ci.org/wearesho-team/i-pay.svg?branch=master)](https://travis-ci.org/wearesho-team/i-pay)
+[![codecov](https://codecov.io/gh/wearesho-team/i-pay/branch/master/graph/badge.svg)](https://codecov.io/gh/wearesho-team/i-pay)
+
 
 ## Installation
 Using composer:

@@ -10,7 +10,7 @@ class ApiException extends \Exception
 {
     public function __construct(int $code, \Throwable $previous = null)
     {
-        parent::__construct($message = "", $code = 0, $previous);
+        parent::__construct($message = "", 0, $previous);
         $this->setCode($code);
     }
 
@@ -21,6 +21,11 @@ class ApiException extends \Exception
         return $this;
     }
 
+    /**
+     * @param int $code
+     * @return string
+     * @codeCoverageIgnore This method contains only configuration
+     */
     protected function _getMessage(int $code): string
     {
         switch ($code) {

@@ -19,7 +19,9 @@ class InvalidSignException extends \Exception
     public function __construct(string $sign, string $salt, string $message = "", int $code = 0, Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
+
         $this->sign = $sign;
+        $this->salt = $salt;
     }
 
     public function getSign(): string
