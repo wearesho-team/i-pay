@@ -34,8 +34,10 @@ class Client implements Payments\ClientInterface
      * @throws GuzzleHttp\Exception\GuzzleException
      * @throws InvalidSignException
      */
-    public function createPayment(Payments\UrlPairInterface $pair, Payments\TransactionInterface $transaction): Payments\PaymentInterface
-    {
+    public function createPayment(
+        Payments\UrlPairInterface $pair,
+        Payments\TransactionInterface $transaction
+    ): Payments\PaymentInterface {
         return $this->createPaymentMultiple($pair, [$transaction]);
     }
 
@@ -50,15 +52,15 @@ class Client implements Payments\ClientInterface
     public function createPaymentMultiple(Payments\UrlPairInterface $pair, array $transactions): Payment
     {
         $request = [
-            'auth' => $this->_requestAuth(),
-            'urls' => $this->_convertUrlPairToArray($pair),
-            'transactions' => array_map([$this, '_convertTransactionToArray'], $transactions),
+            'auth' => $this->requestAuth(),
+            'urls' => $this->convertUrlPairToArray($pair),
+            'transactions' => array_map([$this, 'convertTransactionToArray'], $transactions),
             'lifetime' => $this->config->getLifetime(),
             'version' => $this->config->getVersion(),
             'lang' => $this->config->getLanguage(),
         ];
 
-        return $this->_request($request);
+        return $this->request($request);
     }
 
     /**
@@ -84,15 +86,15 @@ class Client implements Payments\ClientInterface
     public function completePayment(int $paymentId, string $action = Client::ACTION_COMPLETE): Payment
     {
         $request = [
-            'auth' => $this->_requestAuth(),
+            'auth' => $this->requestAuth(),
             'pid' => $paymentId,
             'action' => $action,
             'version' => $this->config->getVersion(),
         ];
-        return $this->_request($request);
+        return $this->request($request);
     }
 
-    private function _convertUrlPairToArray(Payments\UrlPairInterface $pair): array
+    private function convertUrlPairToArray(Payments\UrlPairInterface $pair): array
     {
         return [
             'good' => $pair->getGood(),
@@ -100,7 +102,7 @@ class Client implements Payments\ClientInterface
         ];
     }
 
-    private function _convertTransactionToArray(Payments\TransactionInterface $transaction): array
+    private function convertTransactionToArray(Payments\TransactionInterface $transaction): array
     {
         $array = [
             'mch_id' => $this->config->getId(),
@@ -127,8 +129,7 @@ class Client implements Payments\ClientInterface
         return $array;
     }
 
-
-    private function _requestAuth(): array
+    private function requestAuth(): array
     {
         $salt = sha1(microtime(true));
 
@@ -146,15 +147,14 @@ class Client implements Payments\ClientInterface
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws ApiException
      */
-    private function _request(array $data): Payment
+    private function request(array $data): Payment
     {
         try {
             $response = $this->client->request('post', $this->config->getUrl(), [
                 'form_params' => [
-                    'data' => $this->_toXml($data),
+                    'data' => $this->toXml($data),
                 ],
             ]);
-
         } catch (GuzzleHttp\Exception\RequestException $exception) {
             $body = (string)$exception->getResponse()->getBody();
             if (!preg_match('/<error>(.*)/', $body)) {
@@ -164,7 +164,7 @@ class Client implements Payments\ClientInterface
             throw new ApiException((int)$xml->code);
         }
 
-        $this->_checkResponseSign((string)$response->getBody());
+        $this->checkResponseSign((string)$response->getBody());
         $object = simplexml_load_string((string)$response->getBody());
 
         return new Payment(
@@ -179,7 +179,7 @@ class Client implements Payments\ClientInterface
      * @param $xml
      * @throws InvalidSignException
      */
-    private function _checkResponseSign(string $xml): void
+    private function checkResponseSign(string $xml): void
     {
         preg_match('|\<salt\>(.*?)\<\/salt\>|ism', $xml, $res);
 
@@ -191,7 +191,9 @@ class Client implements Payments\ClientInterface
 
         if (hash_hmac('sha512', $salt, $this->config->getSecret()) !== $sign) {
             throw new InvalidSignException(
-                $sign, $salt, "Invalid sign from response"
+                $sign,
+                $salt,
+                "Invalid sign from response"
             );
         }
     }
@@ -202,7 +204,7 @@ class Client implements Payments\ClientInterface
      * @param \SimpleXMLElement|null $xml
      * @return string
      */
-    private function _toXml($data, $rootNodeName = 'payment', \SimpleXMLElement $xml = null): string
+    private function toXml($data, $rootNodeName = 'payment', \SimpleXMLElement $xml = null): string
     {
         if ($xml == null) {
             $xml = simplexml_load_string("<?xml version='1.0' encoding='utf-8'?><$rootNodeName />");
@@ -215,12 +217,11 @@ class Client implements Payments\ClientInterface
 
             if (is_array($value)) {
                 $node = $xml->addChild($key);
-                static::_toXml($value, $rootNodeName, $node);
+                static::toXml($value, $rootNodeName, $node);
             } else {
                 $value = trim($value);
                 $xml->addChild($key, $value);
             }
-
         }
         return $xml->asXML();
     }
