@@ -2,20 +2,14 @@
 
 namespace Wearesho\Bobra\IPay;
 
+use Horat1us\Environment;
+
 /**
  * Class EnvironmentConfig
  * @package Wearesho\Bobra\IPay
  */
-class EnvironmentConfig implements ConfigInterface
+class EnvironmentConfig extends Environment\Config implements ConfigInterface
 {
-    /** @var string */
-    protected $keyPrefix;
-
-    public function __construct(string $keyPrefix)
-    {
-        $this->keyPrefix = $keyPrefix;
-    }
-
     /**
      * @inheritdoc
      */
@@ -72,19 +66,5 @@ class EnvironmentConfig implements ConfigInterface
         return $this->getEnv("IPAY_DEBUG", false)
             ? ConfigInterface::URL_TEST
             : ConfigInterface::URL_REAL;
-    }
-
-    protected function getEnv(string $key, $default = null)
-    {
-        $value = getenv($this->keyPrefix . $key);
-
-        if ($value === false) {
-            if (!is_null($default)) {
-                return $default;
-            }
-            throw new \DomainException("Missing environment key $key");
-        }
-
-        return $value;
     }
 }
