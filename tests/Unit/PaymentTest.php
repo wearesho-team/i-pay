@@ -15,6 +15,6 @@ class PaymentTest extends TestCase
     {
         $payment = new Payment(1, 'https://google.com', 2);
         $json = json_encode($payment);
-        $this->assertEquals('{"status":2,"url":"https:\/\/google.com"}', $json);
+        $this->assertEquals('{"status":2,"redirectUrl":"https:\/\/google.com"}', $json);
     }
 }
