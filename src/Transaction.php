@@ -22,12 +22,11 @@ class Transaction extends Payments\Transaction implements TransactionInterface
     public function __construct(
         int $service,
         float $amount,
-        string $type = TransactionInterface::TYPE_CHARGE,
         string $description,
+        string $type = TransactionInterface::TYPE_CHARGE,
         array $info = [],
         string $currency = 'UAH'
-    )
-    {
+    ) {
         parent::__construct($service, $amount, $type, $description, $info, $currency);
     }
 

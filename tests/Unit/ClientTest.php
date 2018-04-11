@@ -35,7 +35,6 @@ class ClientTest extends TestCase
         $this->transaction = new IPay\Transaction(
             100,
             100.50,
-            IPay\Transaction::TYPE_CHARGE,
             "Оплата услуг"
         );
         $this->getFunctionMock('Wearesho\\Bobra\\IPay', 'microtime')
@@ -89,6 +88,7 @@ class ClientTest extends TestCase
         $pid = 543;
         $url = 'https://secure.ipay.ua/fac795b9ffa93e0107a66db7a6a0716076c/';
         $salt = '4bd31cc81bf4a882ec19b3f4a2df9a8b1dd4694b';
+        // phpcs:ignore
         $sign = 'e49d266af9710fc455b4a6da239db8efe4a226bdf025a1e3b6dafb5699df0bc5d32c7a6e3bb160868e3c52c02c715251d89571beb6fde7210a9f108cf82b7955';
         $response = '<?xml version="1.0" encoding="utf-8"?> <payment>
 <pid>' . $pid . '</pid> <url>' . $url . '</url> <status>1</status> <salt>' . $salt . '</salt> <sign>' . $sign . '</sign>
@@ -144,6 +144,7 @@ class ClientTest extends TestCase
         $pid = 543;
         $url = 'https://secure.ipay.ua/fac795b9ffa93e0107a66db7a6a0716076c/';
         $salt = '4bd31cc81bf4a882ec19b3f4a2df9a8b1dd4694b';
+        // phpcs:ignore
         $sign = 'e49d266af9710fc455b4a6da239db8efe4a226bdf025a1e3b6dafb5699df0bc5d32c7a6e3bb160868e3c52c02c715251d89571beb6fde7210a9f108cf82b7955';
         $response = '<?xml version="1.0" encoding="utf-8"?> <payment>
 <pid>' . $pid . '</pid> <url>' . $url . '</url> <status>1</status> <salt>' . $salt . '</salt> <sign>' . $sign . '</sign>
@@ -175,6 +176,7 @@ class ClientTest extends TestCase
         $client->completePayment(10);
         $client->reversePayment(11);
 
+        // phpcs:disable
         $requests = [
             // create payment request
             '<?xml version="1.0" encoding="utf-8"?>
@@ -184,6 +186,7 @@ class ClientTest extends TestCase
             '<?xml version="1.0" encoding="utf-8"?>
 <payment><auth><mch_id>123456789</mch_id><salt>e3cbba8883fe746c6e35783c9404b4bc0c7ee9eb</salt><sign>a1e06298be043bd84a9412d71739488e262d3d73068d674fa67a8be207b468aba27f2b6211a6f46d4397de57aefd278f565fa6765adef50a46ff6e86feba7d50</sign></auth><pid>11</pid><action>reversal</action><version>3.00</version></payment>',
         ];
+        // phpcs:enable
 
         foreach ($container as $key => $item) {
             /** @var GuzzleHttp\Psr7\Request $request */
