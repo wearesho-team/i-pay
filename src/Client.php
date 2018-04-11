@@ -136,7 +136,7 @@ class Client implements Payments\ClientInterface
         return [
             'mch_id' => $this->config->getId(),
             'salt' => $salt,
-            'sign' => hash_hmac('sha512', $salt, $this->config->getKey()),
+            'sign' => hash_hmac('sha512', $salt, $this->config->getSecret()),
         ];
     }
 
@@ -176,11 +176,16 @@ class Client implements Payments\ClientInterface
 
 
     /**
-     * @param $xml
+     * @param string $xml
+     * @throws InvalidSaltOrSignException
      * @throws InvalidSignException
      */
     private function checkResponseSign(string $xml): void
     {
+        if ($xml === 'incorrect salt or sign') {
+            throw new InvalidSaltOrSignException();
+        }
+
         preg_match('|\<salt\>(.*?)\<\/salt\>|ism', $xml, $res);
 
         $salt = $res[1];
@@ -189,7 +194,7 @@ class Client implements Payments\ClientInterface
 
         $sign = $res[1];
 
-        if (hash_hmac('sha512', $salt, $this->config->getSecret()) !== $sign) {
+        if (hash_hmac('sha512', $salt, $this->config->getKey()) !== $sign) {
             throw new InvalidSignException(
                 $sign,
                 $salt,
