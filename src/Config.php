@@ -41,11 +41,11 @@ class Config implements ConfigInterface
 
     public function setLanguage(string $language): Config
     {
-        if (
-            $language !== ConfigInterface::LANGUAGE_EN
-            && $language !== ConfigInterface::LANGUAGE_RU
-            && $language !== ConfigInterface::LANGUAGE_UA
-        ) {
+        $isLanguageValid = $language === ConfigInterface::LANGUAGE_EN
+            || $language === ConfigInterface::LANGUAGE_RU
+            || $language === ConfigInterface::LANGUAGE_UA;
+
+        if (!$isLanguageValid) {
             throw new \InvalidArgumentException("Invalid language");
         }
 

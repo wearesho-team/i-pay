@@ -17,7 +17,7 @@ class ApiException extends \Exception
     public function setCode(int $code): ApiException
     {
         $this->code = $code;
-        $this->message = $this->_getMessage($code);
+        $this->message = $this->getMessageByCode($code);
         return $this;
     }
 
@@ -26,7 +26,7 @@ class ApiException extends \Exception
      * @return string
      * @codeCoverageIgnore This method contains only configuration
      */
-    protected function _getMessage(int $code): string
+    protected function getMessageByCode(int $code): string
     {
         switch ($code) {
             case 1:
