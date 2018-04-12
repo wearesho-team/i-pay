@@ -48,7 +48,7 @@ class Payment implements Payments\PaymentInterface
     {
         return [
             'status' => $this->status,
-            'url' => $this->url,
+            'redirectUrl' => $this->url,
         ];
     }
 }
