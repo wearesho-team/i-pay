@@ -8,13 +8,6 @@ namespace Wearesho\Bobra\IPay;
  */
 interface ConfigInterface
 {
-    public const LANGUAGE_RU = 'ru';
-    public const LANGUAGE_UA = 'ua';
-    public const LANGUAGE_EN = 'en';
-
-    public const URL_TEST = 'https://api.sandbox.ipay.ua/';
-    public const URL_REAL = 'https://api.ipay.ua/';
-
     /**
      * Merchant identifier
      *
@@ -45,9 +38,7 @@ interface ConfigInterface
     public function getLifetime(): int;
 
     /**
-     * @see ConfigInterface::LANGUAGE_EN
-     * @see ConfigInterface::LANGUAGE_RU
-     * @see ConfigInterface::LANGUAGE_UA
+     * @see Language
      *
      * @return string
      */

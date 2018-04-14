@@ -4,6 +4,7 @@
 [![Build Status](https://travis-ci.org/wearesho-team/i-pay.svg?branch=master)](https://travis-ci.org/wearesho-team/i-pay)
 [![codecov](https://codecov.io/gh/wearesho-team/i-pay/branch/master/graph/badge.svg)](https://codecov.io/gh/wearesho-team/i-pay)
 
+[Change Log](./CHANGELOG.md)
 
 ## Installation
 Using composer:

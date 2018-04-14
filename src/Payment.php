@@ -10,17 +10,10 @@ use Wearesho\Bobra\Payments;
  */
 class Payment implements Payments\PaymentInterface
 {
-    const PAYMENT_REGISTERED = 1; // Платеж успешно зарегистрирован
-    const PAYMENT_ERROR = 2; // Ошибка при регистрации платежа
-
-    /** @var int */
-    public $id;
+    use PaymentTrait;
 
     /** @var string */
     public $url;
-
-    /** @var int */
-    public $status;
 
     public function __construct(int $id, string $url, int $status)
     {
@@ -29,20 +22,11 @@ class Payment implements Payments\PaymentInterface
         $this->status = $status;
     }
 
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
     public function getUrl(): string
     {
         return $this->url;
     }
 
-    public function getStatus(): int
-    {
-        return $this->status;
-    }
 
     public function jsonSerialize(): array
     {

@@ -47,7 +47,7 @@ class EnvironmentConfig extends Environment\Config implements ConfigInterface
      */
     public function getLanguage(): string
     {
-        return $this->getEnv("IPAY_LANGUAGE", ConfigInterface::LANGUAGE_UA);
+        return $this->getEnv("IPAY_LANGUAGE", Language::UA);
     }
 
     /**
@@ -64,7 +64,7 @@ class EnvironmentConfig extends Environment\Config implements ConfigInterface
     public function getUrl(): string
     {
         return $this->getEnv("IPAY_DEBUG", false)
-            ? ConfigInterface::URL_TEST
-            : ConfigInterface::URL_REAL;
+            ? URL::TEST
+            : URL::REAL;
     }
 }

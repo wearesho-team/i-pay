@@ -38,23 +38,28 @@ class Client implements Payments\ClientInterface
         Payments\UrlPairInterface $pair,
         Payments\TransactionInterface $transaction
     ): Payments\PaymentInterface {
-        return $this->createPaymentMultiple($pair, [$transaction]);
+        return $this->createPaymentMultiple(
+            $pair,
+            new Payments\TransactionCollection([$transaction])
+        );
     }
 
     /**
      * @param Payments\UrlPairInterface $pair
-     * @param TransactionInterface[]|Payments\TransactionInterface[] $transactions
+     * @param Payments\TransactionCollection $transactions
      * @return Payment
      * @throws ApiException
      * @throws GuzzleHttp\Exception\GuzzleException
      * @throws InvalidSignException
      */
-    public function createPaymentMultiple(Payments\UrlPairInterface $pair, array $transactions): Payment
-    {
+    public function createPaymentMultiple(
+        Payments\UrlPairInterface $pair,
+        Payments\TransactionCollection $transactions
+    ): Payment {
         $request = [
             'auth' => $this->requestAuth(),
             'urls' => $this->convertUrlPairToArray($pair),
-            'transactions' => array_map([$this, 'convertTransactionToArray'], $transactions),
+            'transactions' => $this->transformTransactionsToArray($transactions),
             'lifetime' => $this->config->getLifetime(),
             'version' => $this->config->getVersion(),
             'lang' => $this->config->getLanguage(),
@@ -100,6 +105,15 @@ class Client implements Payments\ClientInterface
             'good' => $pair->getGood(),
             'bad' => $pair->getBad(),
         ];
+    }
+
+    private function transformTransactionsToArray(Payments\TransactionCollection $transactions): array
+    {
+        $array = [];
+        foreach ($transactions as $transaction) {
+            $array[] = $this->convertTransactionToArray($transaction);
+        }
+        return $array;
     }
 
     private function convertTransactionToArray(Payments\TransactionInterface $transaction): array
