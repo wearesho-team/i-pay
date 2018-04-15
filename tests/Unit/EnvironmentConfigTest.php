@@ -4,6 +4,7 @@ namespace Wearesho\Bobra\IPay\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use Wearesho\Bobra\IPay;
+use Horat1us\Environment;
 
 /**
  * Class EnvironmentConfigTest
@@ -25,7 +26,7 @@ class EnvironmentConfigTest extends TestCase
         putenv('TIPAY_ID=1');
         $this->assertEquals(1, $this->config->getId());
 
-        $this->expectException(\DomainException::class);
+        $this->expectException(Environment\MissingEnvironmentException::class);
         putenv('TIPAY_ID');
         $this->config->getId();
     }
@@ -35,7 +36,7 @@ class EnvironmentConfigTest extends TestCase
         putenv('TIPAY_KEY=1');
         $this->assertEquals(1, $this->config->getKey());
 
-        $this->expectException(\DomainException::class);
+        $this->expectException(Environment\MissingEnvironmentException::class);
         putenv('TIPAY_KEY');
         $this->config->getKey();
     }
@@ -45,7 +46,7 @@ class EnvironmentConfigTest extends TestCase
         putenv('TIPAY_SECRET=1');
         $this->assertEquals(1, $this->config->getSecret());
 
-        $this->expectException(\DomainException::class);
+        $this->expectException(Environment\MissingEnvironmentException::class);
         putenv('TIPAY_SECRET');
         $this->config->getSecret();
     }

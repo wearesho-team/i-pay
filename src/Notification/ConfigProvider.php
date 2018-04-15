@@ -3,6 +3,7 @@
 namespace Wearesho\Bobra\IPay\Notification;
 
 use Wearesho\Bobra\IPay;
+use Horat1us\Environment;
 
 /**
  * Class ConfigProvider
@@ -32,12 +33,18 @@ class ConfigProvider implements ConfigProviderInterface
     /**
      * @param int $merchantId
      * @return IPay\ConfigInterface
-     * @throws \RuntimeException
+     * @throws UnsupportedMerchantException
      */
     public function provide(int $merchantId): IPay\ConfigInterface
     {
         foreach ($this->configs as $config) {
-            if ($config->getId() === $merchantId) {
+            try {
+                $configMerchantId = $config->getId();
+            } catch (Environment\MissingEnvironmentException $exception) {
+                continue;
+            }
+
+            if ($configMerchantId === $merchantId) {
                 return $config;
             }
         }
