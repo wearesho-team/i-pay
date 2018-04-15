@@ -75,7 +75,7 @@ class Server
     protected function parseTransactions(\SimpleXMLElement $element): Payments\TransactionCollection
     {
         if (!$element->transactions) {
-            throw new InvalidBodyException("Missing transactions");
+            throw new InvalidBodyException($element->asXML(), "Missing transactions");
         }
         $transactions = [];
         foreach ($element->transactions->transaction as $plainTransaction) {
@@ -83,7 +83,7 @@ class Server
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new InvalidBodyException(
                     $element->asXML(),
-                    json_last_error_msg(),
+                    "Transaction Info: " . json_last_error_msg(),
                     json_last_error()
                 );
             }
