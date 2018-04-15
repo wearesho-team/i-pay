@@ -17,6 +17,9 @@ class Transaction extends Payments\Transaction implements TransactionInterface
     protected $fee = null;
 
     /** @var int */
+    protected $merchantId;
+
+    /** @var int */
     protected $type = TransactionInterface::TYPE_CHARGE;
 
     public function __construct(
@@ -55,5 +58,16 @@ class Transaction extends Payments\Transaction implements TransactionInterface
     {
         $this->note = $note;
         return $this;
+    }
+
+    public function setMerchantId(int $merchantId): Transaction
+    {
+        $this->merchantId = $merchantId;
+        return $this;
+    }
+
+    public function getMerchantId(): ?int
+    {
+        return $this->merchantId;
     }
 }

@@ -25,4 +25,10 @@ interface TransactionInterface extends Payments\TransactionInterface
      * @return array
      */
     public function getInfo(): array;
+
+    /**
+     * Идентификатор мерчанта в системе, в пользу которого совершается транзакция
+     * @return int|null
+     */
+    public function getMerchantId(): ?int;
 }

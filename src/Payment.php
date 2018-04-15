@@ -2,24 +2,24 @@
 
 namespace Wearesho\Bobra\IPay;
 
-use Wearesho\Bobra\Payments;
-
 /**
  * Class Payment
  * @package Wearesho\Bobra\IPay
  */
-class Payment implements Payments\PaymentInterface
+class Payment implements PaymentInterface
 {
     use PaymentTrait;
 
     /** @var string */
-    public $url;
+    protected $url;
 
-    public function __construct(int $id, string $url, int $status)
+    public function __construct(int $id, string $url, int $status, string $salt, string $sign)
     {
         $this->id = $id;
         $this->url = $url;
         $this->status = $status;
+        $this->sign = $sign;
+        $this->salt = $salt;
     }
 
     public function getUrl(): string

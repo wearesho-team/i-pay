@@ -118,8 +118,12 @@ class Client implements Payments\ClientInterface
 
     private function convertTransactionToArray(Payments\TransactionInterface $transaction): array
     {
+        $merchantId = $transaction instanceof TransactionInterface
+            ? $transaction->getMerchantId() ?? $this->config->getId()
+            : $this->config->getId();
+
         $array = [
-            'mch_id' => $this->config->getId(),
+            'mch_id' => $merchantId,
             'srv_id' => $transaction->getService(),
             'type' => $transaction->getType(),
             'amount' => $transaction->getAmount(),
@@ -178,38 +182,19 @@ class Client implements Payments\ClientInterface
             throw new ApiException((int)$xml->code);
         }
 
-        $this->checkResponseSign((string)$response->getBody());
         $object = simplexml_load_string((string)$response->getBody());
-
-        return new Payment(
+        $payment = new Payment(
             (int)$object->pid,
             (string)$object->url,
-            (int)$object->status
+            (int)$object->status,
+            (string)$object->salt,
+            (string)$object->sign
         );
-    }
 
+        $service = new SignCheckService($this->config);
+        $service->check($payment);
 
-    /**
-     * @param $xml
-     * @throws InvalidSignException
-     */
-    private function checkResponseSign(string $xml): void
-    {
-        preg_match('|\<salt\>(.*?)\<\/salt\>|ism', $xml, $res);
-
-        $salt = $res[1];
-
-        preg_match('|\<sign\>(.*?)\<\/sign\>|ism', $xml, $res);
-
-        $sign = $res[1];
-
-        if (hash_hmac('sha512', $salt, $this->config->getSecret()) !== $sign) {
-            throw new InvalidSignException(
-                $sign,
-                $salt,
-                "Invalid sign from response"
-            );
-        }
+        return $payment;
     }
 
     /**
