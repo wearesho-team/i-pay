@@ -6,3 +6,4 @@
  [Url](./src/Url.php) and [Language](./src/Language.php) interfaces 
 - Sign and salt added to [PaymentInterface](./src/PaymentInterface.php) and [Payment](./src/Payment.php) class constructor
 - Add optional merchant id to [PaymentInterface](./src/PaymentInterface.php)
+- Implement notification [Server](./src/Notification) to handle notifications about payments
