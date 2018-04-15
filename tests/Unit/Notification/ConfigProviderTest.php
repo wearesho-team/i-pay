@@ -25,8 +25,9 @@ class ConfigProviderTest extends TestCase
     {
         $firstConfig = new IPay\Config(1, 'key', 'secret');
         $secondConfig = new IPay\Config(2, 'key', 'secret');
+        $thirdConfig = new IPay\EnvironmentConfig();
 
-        $provider = new IPay\Notification\ConfigProvider([$firstConfig, $secondConfig]);
+        $provider = new IPay\Notification\ConfigProvider([$firstConfig, $secondConfig, $thirdConfig]);
         $this->assertEquals($firstConfig, $provider->provide(1));
         $this->assertEquals($secondConfig, $provider->provide(2));
 
