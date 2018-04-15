@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnhandledExceptionInspection */
 
 namespace Wearesho\Bobra\IPay\Tests\Unit\Notification;
 
@@ -19,7 +19,8 @@ class ServerTest extends TestCase
     public function testUnsupportedMerchant()
     {
         $server = new IPay\Notification\Server(new IPay\Notification\ConfigProvider());
-        $server->handle('<?xml version="1.0" encoding="utf-8"?> <payment id="143">
+        // phpcs:disable
+        $xml = '<?xml version="1.0" encoding="utf-8"?> <payment id="143">
 <ident>520edda7b4e6e20482a30c85c44a1e56d8e8a666</ident> <status>5</status>
 <amount>5000</amount>
 <currency>UAH</currency> <timestamp>1312201619</timestamp>
@@ -32,7 +33,9 @@ class ServerTest extends TestCase
            </transaction>
       </transactions>
 <salt>4bd31cc81bf4a882ec19b3f4a2df9a8b1dd4694b</salt> <sign>78f1022cb8ffbdcfa0997a5e72...0f324424eb4d2fbffcf21c7426bafe0</sign>
-</payment>');
+</payment>';
+        // phpcs:enable
+        $server->handle($xml);
     }
 
     /**
@@ -50,7 +53,6 @@ class ServerTest extends TestCase
             $this->assertEquals($xml, $exception->getXml());
             throw $exception;
         }
-
     }
 
     /**
@@ -70,7 +72,8 @@ class ServerTest extends TestCase
     public function testInvalidTransactionInfo()
     {
         $server = new IPay\Notification\Server(new IPay\Notification\ConfigProvider());
-        $payment = $server->handle('<?xml version="1.0" encoding="utf-8"?> <payment id="143">
+        // phpcs:disable
+        $xml = '<?xml version="1.0" encoding="utf-8"?> <payment id="143">
 <ident>520edda7b4e6e20482a30c85c44a1e56d8e8a666</ident> <status>5</status>
 <amount>5000</amount>
 <currency>UAH</currency> <timestamp>1312201619</timestamp>
@@ -80,7 +83,9 @@ class ServerTest extends TestCase
 </transaction>
       </transactions>
 <salt>4bd31cc81bf4a882ec19b3f4a2df9a8b1dd4694b</salt> <sign>77da9e174a47dc83453db78c38fcd2937b4ac9f4dcb42ea202bf1087e9f86b95d30154fc1f9da395fe73104bc60d45c6f256c86914d26af595e659076b33c8b3</sign>
-</payment>');
+</payment>';
+        // phpcs:enable
+        $server->handle($xml);
     }
 
     /**
@@ -90,12 +95,15 @@ class ServerTest extends TestCase
     public function testMissingTransactions()
     {
         $server = new IPay\Notification\Server(new IPay\Notification\ConfigProvider());
-        $payment = $server->handle('<?xml version="1.0" encoding="utf-8"?> <payment id="143">
+        // phpcs:disable
+        $xml = '<?xml version="1.0" encoding="utf-8"?> <payment id="143">
 <ident>520edda7b4e6e20482a30c85c44a1e56d8e8a666</ident> <status>5</status>
 <amount>5000</amount>
 <currency>UAH</currency> <timestamp>1312201619</timestamp>
 <salt>4bd31cc81bf4a882ec19b3f4a2df9a8b1dd4694b</salt> <sign>77da9e174a47dc83453db78c38fcd2937b4ac9f4dcb42ea202bf1087e9f86b95d30154fc1f9da395fe73104bc60d45c6f256c86914d26af595e659076b33c8b3</sign>
-</payment>');
+</payment>';
+        // phpcs:disable
+        $server->handle($xml);
     }
 
     /**
@@ -105,27 +113,28 @@ class ServerTest extends TestCase
     public function testWithoutMerchantId()
     {
         $server = new IPay\Notification\Server(new IPay\Notification\ConfigProvider());
-        $server->handle('<?xml version="1.0" encoding="utf-8"?> <payment id="143">
+        // phpcs:disable
+        $xml = '<?xml version="1.0" encoding="utf-8"?> <payment id="143">
 <ident>520edda7b4e6e20482a30c85c44a1e56d8e8a666</ident> <status>5</status>
 <amount>5000</amount>
 <currency>UAH</currency> <timestamp>1312201619</timestamp>
 <transactions> <transaction id="431">
 <srv_id>1</srv_id> <amount>5077</amount> <currency>UAH</currency> <type>10</type> <status>11</status> <code>00</code>
 <desc>Оплата услуг 1</desc> <info>{"dogovor":3512313424}</info>
-</transaction> <transaction id="432">
-<srv_id>1</srv_id> <amount>5077</amount> <currency>UAH</currency> <type>11</type> <status>11</status> <code>00</code>
-<desc>Оплата услуг 2</desc> <info>{"dogovor":3512313424}</info>
-           </transaction>
+</transaction>
       </transactions>
 <salt>4bd31cc81bf4a882ec19b3f4a2df9a8b1dd4694b</salt> <sign>77da9e174a47dc83453db78c38fcd2937b4ac9f4dcb42ea202bf1087e9f86b95d30154fc1f9da395fe73104bc60d45c6f256c86914d26af595e659076b33c8b3</sign>
-</payment>');
+</payment>';
+        // phpcs:enable
+        $server->handle($xml);
     }
 
     public function testPayment()
     {
         $config = new IPay\Config(7, 'test-key', 'test-secret');
         $server = new IPay\Notification\Server(new IPay\Notification\ConfigProvider([$config]));
-        $payment = $server->handle('<?xml version="1.0" encoding="utf-8"?> <payment id="143">
+        // phpcs:disable
+        $xml = '<?xml version="1.0" encoding="utf-8"?> <payment id="143">
 <ident>520edda7b4e6e20482a30c85c44a1e56d8e8a666</ident> <status>5</status>
 <amount>5000</amount>
 <currency>UAH</currency> <timestamp>1312201619</timestamp>
@@ -138,7 +147,11 @@ class ServerTest extends TestCase
            </transaction>
       </transactions>
 <salt>4bd31cc81bf4a882ec19b3f4a2df9a8b1dd4694b</salt> <sign>77da9e174a47dc83453db78c38fcd2937b4ac9f4dcb42ea202bf1087e9f86b95d30154fc1f9da395fe73104bc60d45c6f256c86914d26af595e659076b33c8b3</sign>
-</payment>');
+</payment>';
+        $sign = '77da9e174a47dc83453db78c38fcd2937b4ac9f4dcb42ea202bf1087e9f86b95d30154fc1f9da395fe73104bc60d45c6f256c86914d26af595e659076b33c8b3';
+        // phpcs:enable
+
+        $payment = $server->handle($xml);
         $this->assertEquals(
             new IPay\Notification\Payment(
                 143,
@@ -170,7 +183,7 @@ class ServerTest extends TestCase
                     ))->setMerchantId(7),
                 ]),
                 '4bd31cc81bf4a882ec19b3f4a2df9a8b1dd4694b',
-                '77da9e174a47dc83453db78c38fcd2937b4ac9f4dcb42ea202bf1087e9f86b95d30154fc1f9da395fe73104bc60d45c6f256c86914d26af595e659076b33c8b3'
+                $sign
             ),
             $payment
         );

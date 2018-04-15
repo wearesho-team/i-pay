@@ -99,6 +99,14 @@ class Payment implements IPay\PaymentInterface
      */
     public function jsonSerialize()
     {
-        return $this;
+        return [
+            'id' => $this->getId(),
+            'ident' => $this->getIdent(),
+            'transactions' => $this->getTransactions(),
+            'timestamp' => $this->getTimestamp()->format('Y-m-d H:i:s'),
+            'currency' => $this->getCurrency(),
+            'amount' => $this->getAmount(),
+            'status' => $this->getStatus(),
+        ];
     }
 }

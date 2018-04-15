@@ -70,4 +70,19 @@ class Transaction extends Payments\Transaction implements TransactionInterface
     {
         return $this->merchantId;
     }
+
+    public function jsonSerialize()
+    {
+        $json = parent::jsonSerialize();
+        if (!empty($this->getFee())) {
+            $json['fee'] = $this->getFee();
+        }
+        if (!empty($this->getNote())) {
+            $json['note'] = $this->getNote();
+        }
+        if (!empty($this->getMerchantId())) {
+            $json['merchantId'] = $this->getMerchantId();
+        }
+        return $json;
+    }
 }

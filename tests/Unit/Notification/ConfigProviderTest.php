@@ -41,6 +41,11 @@ class ConfigProviderTest extends TestCase
     public function testMissingConfig()
     {
         $provider = new IPay\Notification\ConfigProvider([]);
-        $provider->provide(1);
+        try {
+            $provider->provide(1);
+        } catch (IPay\Notification\UnsupportedMerchantException $exception) {
+            $this->assertEquals(1, $exception->getMerchantId());
+            throw $exception;
+        }
     }
 }
