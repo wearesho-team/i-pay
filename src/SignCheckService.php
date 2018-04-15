@@ -22,7 +22,7 @@ class SignCheckService
      */
     public function check(PaymentInterface $payment): void
     {
-        if (hash_hmac('sha512', $payment->getSalt(), $this->config->getSecret()) !== $payment->getSign()) {
+        if (hash_hmac('sha512', $payment->getSalt(), $this->config->getKey()) !== $payment->getSign()) {
             throw new InvalidSignException(
                 $payment->getSign(),
                 $payment->getSalt(),

@@ -131,7 +131,7 @@ class ServerTest extends TestCase
 
     public function testPayment()
     {
-        $config = new IPay\Config(7, 'test-key', 'test-secret');
+        $config = new IPay\Config(7, 'test-secret', 'test-key');
         $server = new IPay\Notification\Server(new IPay\Notification\ConfigProvider([$config]));
         // phpcs:disable
         $xml = '<?xml version="1.0" encoding="utf-8"?> <payment id="143">

@@ -154,16 +154,18 @@ class Client implements Payments\ClientInterface
         return [
             'mch_id' => $this->config->getId(),
             'salt' => $salt,
-            'sign' => hash_hmac('sha512', $salt, $this->config->getKey()),
+            'sign' => hash_hmac('sha512', $salt, $this->config->getSecret()),
         ];
     }
 
     /**
      * @param array $data
      * @return Payment
+     *
      * @throws InvalidSignException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws ApiException
+     * @throws InvalidSaltOrSignException
      */
     private function request(array $data): Payment
     {
@@ -182,7 +184,12 @@ class Client implements Payments\ClientInterface
             throw new ApiException((int)$xml->code);
         }
 
-        $object = simplexml_load_string((string)$response->getBody());
+        $body = (string)$response->getBody();
+        if ($body === 'incorrect salt or sign') {
+            throw new InvalidSaltOrSignException();
+        }
+
+        $object = simplexml_load_string($body);
         $payment = new Payment(
             (int)$object->pid,
             (string)$object->url,

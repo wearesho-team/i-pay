@@ -32,7 +32,7 @@ class Payment implements PaymentInterface
     {
         return [
             'status' => $this->status,
-            'url' => $this->url,
+            'redirectUrl' => $this->url,
         ];
     }
 }

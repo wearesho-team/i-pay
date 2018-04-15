@@ -41,7 +41,7 @@ class Transaction extends Payments\Transaction implements TransactionInterface
         return $this->fee;
     }
 
-    public function setFee(float $fee): Payments\Transaction
+    public function setFee(float $fee): Transaction
     {
         return $this->setNumeric($this->fee, $fee);
     }
