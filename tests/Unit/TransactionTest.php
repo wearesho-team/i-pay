@@ -29,7 +29,7 @@ class TransactionTest extends TestCase
             ->setNote('Note');
 
         $this->assertEquals(
-            '{"id":1,"amount":5000,"type":"type","description":"Description","info":{"info":true},"currency":"RUB","fee":250,"note":"Note","merchantId":1}',
+            '{"id":1,"amount":5000,"type":"type","description":"Description","info":{"info":true},"currency":"RUB","fee":250,"note":"Note","merchantId":1}', // phpcs:ignore
             json_encode($transaction)
         );
     }
