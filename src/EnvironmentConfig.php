@@ -64,7 +64,7 @@ class EnvironmentConfig extends Environment\Config implements ConfigInterface
     public function getUrl(): string
     {
         return $this->getEnv("IPAY_DEBUG", false)
-            ? URL::TEST
-            : URL::REAL;
+            ? Url::TEST
+            : Url::REAL;
     }
 }

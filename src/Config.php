@@ -24,7 +24,7 @@ class Config implements ConfigInterface
     protected $language = Language::UA;
 
     /** @var string */
-    protected $url = URL::TEST;
+    protected $url = Url::TEST;
 
     /** @var string */
     protected $version = '3.00';
@@ -57,10 +57,10 @@ class Config implements ConfigInterface
     public function setMode($mode): Config
     {
         switch ($mode) {
-            case URL::TEST:
+            case Url::TEST:
                 $this->url = 'https://api.sandbox.ipay.ua/';
                 break;
-            case URL::REAL:
+            case Url::REAL:
                 $this->url = 'https://api.ipay.ua/';
                 break;
             default:

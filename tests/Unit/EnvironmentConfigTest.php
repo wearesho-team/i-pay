@@ -59,9 +59,9 @@ class EnvironmentConfigTest extends TestCase
 
     public function testGetUrl()
     {
-        $this->assertEquals(IPay\URL::REAL, $this->config->getUrl());
+        $this->assertEquals(IPay\Url::REAL, $this->config->getUrl());
         putenv('TIPAY_DEBUG=1');
-        $this->assertEquals(IPay\URL::TEST, $this->config->getUrl());
+        $this->assertEquals(IPay\Url::TEST, $this->config->getUrl());
     }
 
     public function testGetLanguage()

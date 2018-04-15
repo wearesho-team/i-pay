@@ -31,7 +31,7 @@ class ConfigTest extends TestCase
             'https://api.ipay.ua/',
             $this->config->getUrl()
         );
-        $this->config->setMode(IPay\URL::TEST);
+        $this->config->setMode(IPay\Url::TEST);
         $this->assertEquals(
             'https://api.sandbox.ipay.ua/',
             $this->config->getUrl()
