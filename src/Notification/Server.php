@@ -28,9 +28,14 @@ class Server
     public function handle(string $xml): Payment
     {
         $payment = $this->parseXml($xml);
-        $config = $this->configProvider->provide(
-            $this->getMerchantId($payment->getTransactions())
-        );
+
+        try {
+            $merchantId = $this->getMerchantId($payment->getTransactions());
+        } catch (\RuntimeException $exception) {
+            throw new InvalidBodyException($xml, $exception->getMessage(), 0, $exception);
+        }
+
+        $config = $this->configProvider->provide($merchantId);
 
         $signCheck = new IPay\SignCheckService($config);
         $signCheck->check($payment);

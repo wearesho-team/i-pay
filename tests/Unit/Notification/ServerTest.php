@@ -107,7 +107,7 @@ class ServerTest extends TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Wearesho\Bobra\IPay\Notification\InvalidBodyException
      * @expectedExceptionMessage Merchant Id can not be found
      */
     public function testWithoutMerchantId()
