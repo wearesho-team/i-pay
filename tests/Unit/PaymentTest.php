@@ -13,7 +13,7 @@ class PaymentTest extends TestCase
 {
     public function testJson()
     {
-        $payment = new Payment(1, 'https://google.com', 2);
+        $payment = new Payment(1, 'https://google.com', 2, 'salt', 'sign');
         $json = json_encode($payment);
         $this->assertEquals('{"status":2,"redirectUrl":"https:\/\/google.com"}', $json);
     }

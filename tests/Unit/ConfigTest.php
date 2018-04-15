@@ -18,20 +18,20 @@ class ConfigTest extends TestCase
 
     public function testSetLanguage()
     {
-        $this->config->setLanguage(IPay\ConfigInterface::LANGUAGE_RU);
-        $this->assertEquals(IPay\ConfigInterface::LANGUAGE_RU, $this->config->getLanguage());
+        $this->config->setLanguage(IPay\Language::RU);
+        $this->assertEquals(IPay\Language::RU, $this->config->getLanguage());
         $this->expectException(\InvalidArgumentException::class);
         $this->config->setLanguage("uk");
     }
 
     public function testSetMode()
     {
-        $this->config->setMode(IPay\Config::MODE_REAL);
+        $this->config->setMode(IPay\Url::REAL);
         $this->assertEquals(
             'https://api.ipay.ua/',
             $this->config->getUrl()
         );
-        $this->config->setMode(IPay\Config::MODE_TEST);
+        $this->config->setMode(IPay\Url::TEST);
         $this->assertEquals(
             'https://api.sandbox.ipay.ua/',
             $this->config->getUrl()

@@ -17,6 +17,9 @@ class Transaction extends Payments\Transaction implements TransactionInterface
     protected $fee = null;
 
     /** @var int */
+    protected $merchantId;
+
+    /** @var int */
     protected $type = TransactionInterface::TYPE_CHARGE;
 
     public function __construct(
@@ -38,9 +41,9 @@ class Transaction extends Payments\Transaction implements TransactionInterface
         return $this->fee;
     }
 
-    public function setFee(float $fee): Payments\Transaction
+    public function setFee(float $fee): Transaction
     {
-        return $this->_setNumeric($this->fee, $fee);
+        return $this->setNumeric($this->fee, $fee);
     }
 
     /**
@@ -55,5 +58,31 @@ class Transaction extends Payments\Transaction implements TransactionInterface
     {
         $this->note = $note;
         return $this;
+    }
+
+    public function setMerchantId(int $merchantId): Transaction
+    {
+        $this->merchantId = $merchantId;
+        return $this;
+    }
+
+    public function getMerchantId(): ?int
+    {
+        return $this->merchantId;
+    }
+
+    public function jsonSerialize()
+    {
+        $json = parent::jsonSerialize();
+        if (!empty($this->getFee())) {
+            $json['fee'] = $this->getFee();
+        }
+        if (!empty($this->getNote())) {
+            $json['note'] = $this->getNote();
+        }
+        if (!empty($this->getMerchantId())) {
+            $json['merchantId'] = $this->getMerchantId();
+        }
+        return $json;
     }
 }

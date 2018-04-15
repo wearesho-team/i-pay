@@ -21,10 +21,10 @@ class Config implements ConfigInterface
     protected $secret;
 
     /** @var string */
-    protected $language = ConfigInterface::LANGUAGE_UA;
+    protected $language = Language::UA;
 
     /** @var string */
-    protected $url = Config::URL_TEST;
+    protected $url = Url::TEST;
 
     /** @var string */
     protected $version = '3.00';
@@ -41,9 +41,9 @@ class Config implements ConfigInterface
 
     public function setLanguage(string $language): Config
     {
-        $isLanguageValid = $language === ConfigInterface::LANGUAGE_EN
-            || $language === ConfigInterface::LANGUAGE_RU
-            || $language === ConfigInterface::LANGUAGE_UA;
+        $isLanguageValid = $language === Language::UA
+            || $language === Language::RU
+            || $language === Language::EN;
 
         if (!$isLanguageValid) {
             throw new \InvalidArgumentException("Invalid language");
@@ -57,10 +57,10 @@ class Config implements ConfigInterface
     public function setMode($mode): Config
     {
         switch ($mode) {
-            case static::MODE_TEST:
+            case Url::TEST:
                 $this->url = 'https://api.sandbox.ipay.ua/';
                 break;
-            case static::MODE_REAL:
+            case Url::REAL:
                 $this->url = 'https://api.ipay.ua/';
                 break;
             default:

@@ -38,23 +38,28 @@ class Client implements Payments\ClientInterface
         Payments\UrlPairInterface $pair,
         Payments\TransactionInterface $transaction
     ): Payments\PaymentInterface {
-        return $this->createPaymentMultiple($pair, [$transaction]);
+        return $this->createPaymentMultiple(
+            $pair,
+            new Payments\TransactionCollection([$transaction])
+        );
     }
 
     /**
      * @param Payments\UrlPairInterface $pair
-     * @param TransactionInterface[]|Payments\TransactionInterface[] $transactions
+     * @param Payments\TransactionCollection $transactions
      * @return Payment
      * @throws ApiException
      * @throws GuzzleHttp\Exception\GuzzleException
      * @throws InvalidSignException
      */
-    public function createPaymentMultiple(Payments\UrlPairInterface $pair, array $transactions): Payment
-    {
+    public function createPaymentMultiple(
+        Payments\UrlPairInterface $pair,
+        Payments\TransactionCollection $transactions
+    ): Payment {
         $request = [
             'auth' => $this->requestAuth(),
             'urls' => $this->convertUrlPairToArray($pair),
-            'transactions' => array_map([$this, 'convertTransactionToArray'], $transactions),
+            'transactions' => $this->transformTransactionsToArray($transactions),
             'lifetime' => $this->config->getLifetime(),
             'version' => $this->config->getVersion(),
             'lang' => $this->config->getLanguage(),
@@ -102,10 +107,23 @@ class Client implements Payments\ClientInterface
         ];
     }
 
+    private function transformTransactionsToArray(Payments\TransactionCollection $transactions): array
+    {
+        $array = [];
+        foreach ($transactions as $transaction) {
+            $array[] = $this->convertTransactionToArray($transaction);
+        }
+        return $array;
+    }
+
     private function convertTransactionToArray(Payments\TransactionInterface $transaction): array
     {
+        $merchantId = $transaction instanceof TransactionInterface
+            ? $transaction->getMerchantId() ?? $this->config->getId()
+            : $this->config->getId();
+
         $array = [
-            'mch_id' => $this->config->getId(),
+            'mch_id' => $merchantId,
             'srv_id' => $transaction->getService(),
             'type' => $transaction->getType(),
             'amount' => $transaction->getAmount(),
@@ -143,9 +161,11 @@ class Client implements Payments\ClientInterface
     /**
      * @param array $data
      * @return Payment
+     *
      * @throws InvalidSignException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws ApiException
+     * @throws InvalidSaltOrSignException
      */
     private function request(array $data): Payment
     {
@@ -164,43 +184,24 @@ class Client implements Payments\ClientInterface
             throw new ApiException((int)$xml->code);
         }
 
-        $this->checkResponseSign((string)$response->getBody());
-        $object = simplexml_load_string((string)$response->getBody());
-
-        return new Payment(
-            (int)$object->pid,
-            (string)$object->url,
-            (int)$object->status
-        );
-    }
-
-
-    /**
-     * @param string $xml
-     * @throws InvalidSaltOrSignException
-     * @throws InvalidSignException
-     */
-    private function checkResponseSign(string $xml): void
-    {
-        if ($xml === 'incorrect salt or sign') {
+        $body = (string)$response->getBody();
+        if ($body === 'incorrect salt or sign') {
             throw new InvalidSaltOrSignException();
         }
 
-        preg_match('|\<salt\>(.*?)\<\/salt\>|ism', $xml, $res);
+        $object = simplexml_load_string($body);
+        $payment = new Payment(
+            (int)$object->pid,
+            (string)$object->url,
+            (int)$object->status,
+            (string)$object->salt,
+            (string)$object->sign
+        );
 
-        $salt = $res[1];
+        $service = new SignCheckService($this->config);
+        $service->check($payment);
 
-        preg_match('|\<sign\>(.*?)\<\/sign\>|ism', $xml, $res);
-
-        $sign = $res[1];
-
-        if (hash_hmac('sha512', $salt, $this->config->getKey()) !== $sign) {
-            throw new InvalidSignException(
-                $sign,
-                $salt,
-                "Invalid sign from response"
-            );
-        }
+        return $payment;
     }
 
     /**

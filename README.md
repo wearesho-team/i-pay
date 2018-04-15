@@ -4,6 +4,7 @@
 [![Build Status](https://travis-ci.org/wearesho-team/i-pay.svg?branch=master)](https://travis-ci.org/wearesho-team/i-pay)
 [![codecov](https://codecov.io/gh/wearesho-team/i-pay/branch/master/graph/badge.svg)](https://codecov.io/gh/wearesho-team/i-pay)
 
+[Change Log](./CHANGELOG.md)
 
 ## Installation
 Using composer:
@@ -16,6 +17,7 @@ composer install wearesho-team/i-pay
 - SimpleXML
 
 ## Usage
+### Creating Payments
 For configuring you application use [ConfigInterface](./src/ConfigInterface.php)
 (implementation also available in [Config](./src/Config.php) class)
 
@@ -61,6 +63,47 @@ $client->completePayment($paymentId = 3456);
 $client->completePayment($paymentId = 3456, IPay\Client::ACTION_REVERSAL);
 // or
 $client->reversePayment($paymentId = 3456);
+
+```
+### Handling notification
+Implement controller using your framework
+```php
+<?php
+
+namespace App;
+
+use Wearesho\Bobra\IPay;
+
+class Controller {
+    public function actionIPay() {
+        // You may handle as many merchant id as you want
+        // just pass here configurations with different merchant IDs
+        $configProvider = new IPay\Notification\ConfigProvider([
+            new IPay\Config(1, "key", "secret"),
+            new IPay\Config(2, "another-key", "another-secret"),
+        ]);
+        $server = new IPay\Notification\Server($configProvider);
+
+        $xml = $_POST['xml'];
+        if (empty($xml)) {
+            throw new \HttpException(400, "Missing XML");
+        }
+
+        try {
+            // Sign checking will be done automatically 
+            $payment = $server->handle($xml);
+        } catch (IPay\Notification\InvalidBodyException | IPay\InvalidSignException $exception) {
+            throw new \HttpException(400, $exception->getMessage(), 0, $exception);
+        } catch (IPay\Notification\UnsupportedMerchantException $exception) {
+            throw new \HttpException(
+                501,
+                "Merchant ID {$exception->getMerchantId()} is not configured"
+            );
+        }
+
+        // do what you want with payment
+    }
+}
 
 ```
 

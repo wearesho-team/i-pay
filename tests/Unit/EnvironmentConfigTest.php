@@ -3,8 +3,8 @@
 namespace Wearesho\Bobra\IPay\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
-use Wearesho\Bobra\IPay\ConfigInterface;
-use Wearesho\Bobra\IPay\EnvironmentConfig;
+use Wearesho\Bobra\IPay;
+use Horat1us\Environment;
 
 /**
  * Class EnvironmentConfigTest
@@ -12,13 +12,13 @@ use Wearesho\Bobra\IPay\EnvironmentConfig;
  */
 class EnvironmentConfigTest extends TestCase
 {
-    /** @var EnvironmentConfig */
+    /** @var IPay\EnvironmentConfig */
     protected $config;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->config = new EnvironmentConfig("T");
+        $this->config = new IPay\EnvironmentConfig("T");
     }
 
     public function testGetId()
@@ -26,7 +26,7 @@ class EnvironmentConfigTest extends TestCase
         putenv('TIPAY_ID=1');
         $this->assertEquals(1, $this->config->getId());
 
-        $this->expectException(\DomainException::class);
+        $this->expectException(Environment\MissingEnvironmentException::class);
         putenv('TIPAY_ID');
         $this->config->getId();
     }
@@ -36,7 +36,7 @@ class EnvironmentConfigTest extends TestCase
         putenv('TIPAY_KEY=1');
         $this->assertEquals(1, $this->config->getKey());
 
-        $this->expectException(\DomainException::class);
+        $this->expectException(Environment\MissingEnvironmentException::class);
         putenv('TIPAY_KEY');
         $this->config->getKey();
     }
@@ -46,7 +46,7 @@ class EnvironmentConfigTest extends TestCase
         putenv('TIPAY_SECRET=1');
         $this->assertEquals(1, $this->config->getSecret());
 
-        $this->expectException(\DomainException::class);
+        $this->expectException(Environment\MissingEnvironmentException::class);
         putenv('TIPAY_SECRET');
         $this->config->getSecret();
     }
@@ -60,16 +60,16 @@ class EnvironmentConfigTest extends TestCase
 
     public function testGetUrl()
     {
-        $this->assertEquals(ConfigInterface::URL_REAL, $this->config->getUrl());
+        $this->assertEquals(IPay\Url::REAL, $this->config->getUrl());
         putenv('TIPAY_DEBUG=1');
-        $this->assertEquals(ConfigInterface::URL_TEST, $this->config->getUrl());
+        $this->assertEquals(IPay\Url::TEST, $this->config->getUrl());
     }
 
     public function testGetLanguage()
     {
-        $this->assertEquals(ConfigInterface::LANGUAGE_UA, $this->config->getLanguage());
-        putenv("TIPAY_LANGUAGE=" . ConfigInterface::LANGUAGE_RU);
-        $this->assertEquals(ConfigInterface::LANGUAGE_RU, $this->config->getLanguage());
+        $this->assertEquals(IPay\Language::UA, $this->config->getLanguage());
+        putenv("TIPAY_LANGUAGE=" . IPay\Language::RU);
+        $this->assertEquals(IPay\Language::RU, $this->config->getLanguage());
     }
 
     public function testGetVersion()
